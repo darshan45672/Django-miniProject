@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Product
+from .models import Product, Category
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 # from django.contrib.auth.models import User
@@ -56,3 +56,19 @@ def registerUser(request):
             return redirect('register')
     else:
         return render(request, 'register.html', {'form':form})
+    
+def product(request, pk):
+    product = Product.objects.get(id=pk)
+    return render(request, 'product.html', {'product' : product})
+
+def category(request, categorySearch):
+    categorySearch = categorySearch.replace('-',' ')
+    # category from url
+    try:
+        # search category
+        getCategory = Category.objects.get(name=categorySearch)
+        product = Product.objects.filter(category= getCategory)
+        return render(request, 'category.html', {'products': product, 'category': getCategory})
+    except:
+        messages.success(request,("The category is unavailable"))
+        return redirect('home')
