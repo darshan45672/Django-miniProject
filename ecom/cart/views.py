@@ -15,7 +15,10 @@ def cartAdd(request):
 
         cart.add(product=product)
 
-        response = JsonResponse({"Product Name: ": product.name})
+        cartQuantity = cart.__len__()
+
+        # response = JsonResponse({"Product Name: ": product.name})
+        response = JsonResponse({"Quantity: ": cartQuantity})
 
         return response    
 
