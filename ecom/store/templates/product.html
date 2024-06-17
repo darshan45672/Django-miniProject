@@ -41,11 +41,11 @@
         action: 'post',
       },
       success: function(json){
-        <!-- console.log(json) -->
+        //console.log(json)
          document.getElementById("cart-quantity").textContent = json.Quantity
       },
       error: function(xhr, errmsg, err){
-
+        
       }
     });
   })
