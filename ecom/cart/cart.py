@@ -58,3 +58,12 @@ class Cart():
         if productId in self.cart:
             del self.cart[productId]
             self.session.modified = True
+        return 
+    
+    def total(self):
+        total = 0
+
+        for product in self.get_products():
+            total += product.price * self.cart[str(product.id)]
+        
+        return total
