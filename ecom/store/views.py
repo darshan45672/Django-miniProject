@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from .models import Product, Category
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm
+from .forms import SignUpForm, UpdateUserForm
+from django.contrib.auth.models import User
 
 def categorySummary(request):
     categories = Category.objects.all()
@@ -73,3 +74,19 @@ def category(request, categorySearch):
     except:
         messages.success(request,("The category is unavailable"))
         return redirect('home')
+    
+def updateUser(request):
+    if request.user.is_authenticated:
+        currentUser = User.objects.get(id=request.user.id)
+        userForm = UpdateUserForm(request.POST or None, instance = currentUser)
+
+        if userForm.is_valid():
+            userForm.save()
+            login(request, currentUser)
+            messages.success(request,("User has been updated"))
+
+            return redirect('home')
+        return render(request, 'userUpdate.html', {'userForm': userForm})
+    else:
+        messages.success(request,("You need to be logged in to update your profile"))
+        return redirect('login')
