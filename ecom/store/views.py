@@ -5,6 +5,8 @@ from django.contrib import messages
 from .forms import SignUpForm, UpdateUserForm, UpdatePasswordForm, UserInfoForm
 from django.contrib.auth.models import User
 from django.db.models import Q
+import json
+from cart.cart import Cart
 
 def categorySummary(request):
     categories = Category.objects.all()
@@ -26,6 +28,17 @@ def loginUser(request):
 
         if user is not None:
             login(request, user)
+
+            currentUser = Profile.objects.get(user__id=request.user.id)
+            savedCart = currentUser.oldCart
+
+            if savedCart is not None:
+                convertedCart = json.loads(savedCart)
+                cart = Cart(request)
+                for key,value in convertedCart.items():
+                    cart.dbAdd(product=key, quantity=value)
+
+
             messages.success(request, ("you have logged in"))
             return redirect('home')
         else: 
