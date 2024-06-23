@@ -4,6 +4,9 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from .forms import SignUpForm, UpdateUserForm, UpdatePasswordForm, UserInfoForm
 from django.contrib.auth.models import User
+from django.db.models import Q
+import json
+from cart.cart import Cart
 
 def categorySummary(request):
     categories = Category.objects.all()
@@ -25,6 +28,17 @@ def loginUser(request):
 
         if user is not None:
             login(request, user)
+
+            currentUser = Profile.objects.get(user__id=request.user.id)
+            savedCart = currentUser.oldCart
+
+            if savedCart is not None:
+                convertedCart = json.loads(savedCart)
+                cart = Cart(request)
+                for key,value in convertedCart.items():
+                    cart.dbAdd(product=key, quantity=value)
+
+
             messages.success(request, ("you have logged in"))
             return redirect('home')
         else: 
@@ -127,3 +141,15 @@ def updateInfo(request):
     else:
         messages.success(request,("You need to be logged in to update your profile"))
         return redirect('login')
+    
+def search(request):
+    if request.method == "POST":
+        searchItem = request.POST['search']
+        searchedItem = Product.objects.filter(Q(name__icontains=searchItem) | Q(description__icontains=searchItem))
+        if not searchedItem:
+            messages.success(request,("No search results found"))
+            return render(request, 'search.html', {})   
+        return render(request, 'search.html', {'searchItem': searchedItem})   
+    
+    else:
+        return render(request, 'search.html', {})
