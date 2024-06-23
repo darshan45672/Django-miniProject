@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from .models import Product, Category
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, UpdateUserForm
+from .forms import SignUpForm, UpdateUserForm, UpdatePasswordForm
 from django.contrib.auth.models import User
 
 def categorySummary(request):
@@ -89,4 +89,26 @@ def updateUser(request):
         return render(request, 'userUpdate.html', {'userForm': userForm})
     else:
         messages.success(request,("You need to be logged in to update your profile"))
+        return redirect('login')
+    
+def updatePassword(request):
+    if request.user.is_authenticated:
+        current_user = request.user
+
+        if request.method == 'POST':
+            form = UpdatePasswordForm(current_user, request.POST)
+
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Your password has been updated")
+                # login(request, current_user)
+                return redirect('login')
+            else:
+                for error in list(form.errors.values()):
+                    messages.error(request, error)
+        else:
+            form = UpdatePasswordForm(current_user)
+            return render(request, 'userPassword.html', {"form" : form})
+    else:
+        messages.success(request,("You need to be logged in to update your password"))
         return redirect('login')
