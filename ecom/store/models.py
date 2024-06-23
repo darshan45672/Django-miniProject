@@ -1,5 +1,26 @@
 from django.db import models
 import datetime
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+
+class Profile(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    dateModified = models.DateTimeField(User, auto_now=True)
+    phone = models.CharField(max_length=20, blank=True)
+    address1 = models.CharField(max_length=200, blank=True)
+    address2 = models.CharField(max_length=200, blank=True)
+    city = models.CharField(max_length=200, blank=True)
+    state = models.CharField(max_length=200, blank=True)
+    zipcode = models.CharField(max_length=200, blank=True)
+    country = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return self.user.username
+
+def createProfile(sender,instance,created, **kwargs):
+    if created:
+        userProfile = Profile(user = instance)
+        userProfile.save()
 
 #Category model
 class Category(models.Model):
