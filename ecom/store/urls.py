@@ -8,6 +8,7 @@ urlpatterns = [
     path('logout/',views.logoutUser, name="logout"),
     path('register/',views.registerUser, name="register"),
     path('update-user/',views.updateUser, name="updateUser"),
+    path('update-info/',views.updateInfo, name="updateInfo"),
     path('update-password/',views.updatePassword, name="updatePassword"),
     path('product/<int:pk>',views.product, name="product"),
     path('category/<str:categorySearch>',views.category, name="category"),
